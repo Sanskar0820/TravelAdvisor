@@ -1,8 +1,7 @@
 import React, { useState, useEffect, createRef } from 'react';
 import { CircularProgress, Grid, Typography, InputLabel, MenuItem, FormControl, Select } from '@mui/material';
 
-import PlaceDetails from '../PlaceDetails/PlaceDetails'
-
+import PlaceDetails from '../PlaceDetails/PlaceDetails';
 import useStyles from './styles';
 
 const List = ({ places, childClicked, isLoading, type, setType, rating, setRating }) => {
@@ -13,13 +12,9 @@ const List = ({ places, childClicked, isLoading, type, setType, rating, setRatin
         setElRefs((refs) => Array(places?.length).fill().map((_, i) => refs[i] || createRef()));
     }, [places]);
 
-
-
     useEffect(() => {
         console.log('Child clicked:', childClicked);
     }, [childClicked]);
-
-
 
     return (
         <div className={classes.container}>
@@ -49,21 +44,30 @@ const List = ({ places, childClicked, isLoading, type, setType, rating, setRatin
                             </Select>
                         </FormControl>
                     </div>
+
                     <Grid container spacing={3} className={classes.list}>
-                        {places?.map((place, i) => (
-                            <Grid item key={i} xs={12}>
-                                <PlaceDetails
-                                    place={place}
-                                    selected={Number(childClicked) === i}
-                                    refProp={elRefs[i]}
-                                />
+                        {places?.length > 0 ? (
+                            places.map((place, i) => (
+                                <Grid item key={i} xs={12}>
+                                    <PlaceDetails
+                                        place={place}
+                                        selected={Number(childClicked) === i}
+                                        refProp={elRefs[i]}
+                                    />
+                                </Grid>
+                            ))
+                        ) : (
+                            <Grid item xs={12}>
+                                <Typography variant="h6" align="center" style={{ marginTop: '20px', color: '#888' }}>
+                                    No places found. Try adjusting filters or searching a different area.
+                                </Typography>
                             </Grid>
-                        ))}
+                        )}
                     </Grid>
                 </>
             )}
         </div>
-    )
+    );
 };
 
 export default List;
