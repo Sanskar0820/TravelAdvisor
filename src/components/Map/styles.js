@@ -13,4 +13,13 @@ export default makeStyles(() => ({
     pointer: {
       cursor: 'pointer',
     },
+    weatherWidget: {
+      position: 'absolute',
+      top: 70,
+      right: 10,
+      backgroundColor: 'rgba(255, 255, 255, 0.8)',
+      padding: '10px',
+      borderRadius: '8px',
+      textAlign: 'center',
+    },
   }));

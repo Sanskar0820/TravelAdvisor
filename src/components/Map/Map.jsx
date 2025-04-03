@@ -6,12 +6,14 @@ import Rating from '@mui/material/Rating';
 
 import useStyles from './styles';
 import mapStyles from './mapStyles';
+import { getWeatherData } from '../../api/getWeatherData'; // Import weather API function
 
 const DEFAULT_COORDINATES = { lat: 28.6139, lng: 77.2090 }; // Default: New Delhi, India
 
 const Map = ({ setCoordinates, setBounds, coordinates, places, setChildClicked }) => {
   const classes = useStyles();
   const isDesktop = useMediaQuery('(min-width:600px)');
+  const [weather, setWeather] = useState(null);
 
   useEffect(() => {
     // Set default location first
@@ -24,13 +26,22 @@ const Map = ({ setCoordinates, setBounds, coordinates, places, setChildClicked }
         },
         () => {
           console.warn('Location permission denied. Using default location.');
-          // Default coordinates remain unchanged if permission is denied
         }
       );
     } else {
       console.warn('Geolocation is not supported by this browser.');
     }
   }, [setCoordinates]);
+
+  useEffect(() => {
+    const fetchWeather = async () => {
+      if (coordinates.lat && coordinates.lng) {
+        const data = await getWeatherData(coordinates.lat, coordinates.lng);
+        setWeather(data);
+      }
+    };
+    fetchWeather();
+  }, [coordinates]);
 
   return (
     <div className={classes.mapContainer}>
@@ -42,9 +53,7 @@ const Map = ({ setCoordinates, setBounds, coordinates, places, setChildClicked }
         margin={[50, 50, 50, 50]}
         options={{ disableDefaultUI: true, zoomControl: true, styles: mapStyles }}
         onChange={(e) => {
-          // Prevent the page from scrolling down
           window.scrollTo(0, 0);
-
           setCoordinates({ lat: e.center.lat, lng: e.center.lng });
           setBounds({
             ne: { lat: e.marginBounds.ne.lat, lng: e.marginBounds.ne.lng },
@@ -53,8 +62,6 @@ const Map = ({ setCoordinates, setBounds, coordinates, places, setChildClicked }
         }}
         onChildClick={(child) => setChildClicked(child)}
       >
-
-
         {places?.map((place, i) => (
           <div
             className={classes.markerContainer}
@@ -84,6 +91,16 @@ const Map = ({ setCoordinates, setBounds, coordinates, places, setChildClicked }
           </div>
         ))}
       </GoogleMapReact>
+
+      {/* Weather Widget */}
+      {weather && (
+        <div className={classes.weatherWidget}>
+          <Typography variant="h6">🌤️ Weather Info</Typography>
+          <Typography variant="body2">Temp: {weather.data.values.temperature}°C</Typography>
+          <Typography variant="body2">Wind: {weather.data.values.windSpeed} m/s</Typography>
+          <Typography variant="body2">Condition: {weather.data.values.weatherCode}</Typography>
+        </div>
+      )}
     </div>
   );
 };
